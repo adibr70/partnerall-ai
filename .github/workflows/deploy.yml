@@ -1,0 +1,26 @@
+name: Deploy to dsme-server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via jump host
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 10.8.0.100
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 2881
+          proxy_host: 62.171.181.158
+          proxy_username: deploy
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          proxy_port: 2881
+          script: |
+            cd /root/partnerall-ai
+            git pull origin main
+            sudo systemctl restart ai-server
+            echo "Deploy complete!"
